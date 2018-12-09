@@ -115,26 +115,17 @@ void Mesh::draw()
 
 void Mesh::drawWire()
 {
+
     for(int i = 0; i < _face_number; i++) {
-
-        if (i == 0) glColor3d(1,0,0);
-        else if (i == 1) glColor3d(0,1,0);
-        else if (i == 2) glColor3d(0,0,1);
-        else glColor3d(1,1,0);
-
-        glBegin(GL_LINE_STRIP);
+            glBegin(GL_LINE_STRIP);
+            glColor3d(1,0,0);
             glPVertexDraw(_vertexArray[_facesArray[i].a()]);
             glPVertexDraw(_vertexArray[_facesArray[i].b()]);
-        glEnd();
-        glBegin(GL_LINE_STRIP);
-            glPVertexDraw(_vertexArray[_facesArray[i].b()]);
             glPVertexDraw(_vertexArray[_facesArray[i].c()]);
-        glEnd();
-        glBegin(GL_LINE_STRIP);
-            glPVertexDraw(_vertexArray[_facesArray[i].c()]);
-            glPVertexDraw(_vertexArray[_facesArray[i].b()]);
-        glEnd();
+            glPVertexDraw(_vertexArray[_facesArray[i].a()]);
+            glEnd();
     }
+
 
 }
 
@@ -175,7 +166,6 @@ void  Mesh::readMesh(QString fileName)
     int countFace = 0;
 
     while (!line.isNull()) {
-       std::cout << "here\n" << std::endl;
         line = stream.readLine();
         if(line.split(" ", QString::SkipEmptyParts).count() == 3)
         {
@@ -219,9 +209,10 @@ void  Mesh::readMesh(QString fileName)
                 }
                 else
                 {
-                    std::cout<<"------New---------"<<std::endl;
+
                     Edges[sortString(a,b)] = countFace;
                     Edges[sortString(b,a)] = countFace;
+                    _edgeArray.push_back(Edge(a,b,length(a,b)));
                 }
 
                     //
@@ -236,9 +227,10 @@ void  Mesh::readMesh(QString fileName)
                 }
                 else
                 {
-                    std::cout<<"------New---------"<<std::endl;
+
                     Edges[sortString(b,c)] = countFace;
                     Edges[sortString(c,b)] = countFace;
+                    _edgeArray.push_back(Edge(b,c,length(b,c)));
                 }
 
                 if(Edges.count(sortString(c,a)) > 0 || Edges.count(sortString(a,c)) > 0){
@@ -251,9 +243,10 @@ void  Mesh::readMesh(QString fileName)
                    }
                  else
                 {
-                     std::cout<<"------New---------"<<std::endl;
+
                      Edges[sortString(c,a)] = countFace;
                      Edges[sortString(a,c)] = countFace;
+                     _edgeArray.push_back(Edge(c,a,length(c,a)));
                 }
 
 
@@ -262,5 +255,62 @@ void  Mesh::readMesh(QString fileName)
             }
 
     };
+
+    quickSort(_edgeArray,0,_edgeArray.size()-1);
+
+    for(int i=0; i<_edgeArray.size(); i++)
+    {
+        cout<<_edgeArray[i].length()<<" < ";
+    }
+    cout<<endl;
+}
+float Mesh::length(int v1, int v2)
+{
+    float x1 = _vertexArray[v1].x();
+    float x2 = _vertexArray[v2].x();
+    float y1 = _vertexArray[v1].y();
+    float y2 = _vertexArray[v2].y();
+    float z1 = _vertexArray[v1].z();
+    float z2 = _vertexArray[v2].z();
+
+    return qSqrt( (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) + (z1-z2)*(z1-z2) );
+
+}
+void Mesh::quickSort(QVector<Edge> & edge_array, int low, int high)
+{
+    if (low < high)
+        {
+            /* pi is partitioning index, arr[p] is now
+               at right place */
+            int pi = partition(edge_array, low, high);
+
+            // Separately sort elements before
+            // partition and after partition
+            quickSort(edge_array, low, pi - 1);
+            quickSort(edge_array, pi + 1, high);
+        }
+}
+int Mesh::partition(QVector<Edge> & edge_array, int low, int high)
+{
+    float pivot = edge_array[high].length();    // pivot
+        int i = (low - 1);  // Index of smaller element
+
+        for (int j = low; j <= high- 1; j++)
+        {
+            // If current element is smaller than or
+            // equal to pivot
+            if (edge_array[j].length() > pivot)
+            {
+                i++;    // increment index of smaller element
+                Edge arr_i = edge_array[i];
+                edge_array[i] =  edge_array[j];
+                edge_array[j] =  arr_i;
+            }
+        }
+        Edge arr_i1 = edge_array[i+1];
+        edge_array[i+1] =  edge_array[high];
+        edge_array[high] =  arr_i1;
+
+        return (i + 1);
 }
 

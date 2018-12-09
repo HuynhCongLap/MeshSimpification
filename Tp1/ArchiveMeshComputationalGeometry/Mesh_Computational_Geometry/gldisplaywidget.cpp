@@ -32,8 +32,8 @@ void GLDisplayWidget::initializeGL()
 
 
     //_mesh.readMesh("pyramid.off");
-    _mesh.readMesh("queen.off");
-    _mesh.test_face();
+    _mesh.readMesh("dog.off");
+   // _mesh.test_face();
 }
 void GLDisplayWidget::paintGL(){
 
@@ -60,7 +60,7 @@ void GLDisplayWidget::paintGL(){
     else
     _mesh.draw();
     */
-
+     _mesh.drawWire();
 }
 
 void GLDisplayWidget::resizeGL(int width, int height){

@@ -9,6 +9,7 @@
 #include <QFile>
 #include <iterator>
 #include <iostream>
+#include <qmath.h>
 using namespace std;
 // TO MODIFY
 // Advice => You should create a new file for each module but not necessarily for each class
@@ -162,6 +163,31 @@ public:
     }*/
 };
 
+class Edge{
+    QVector <int> _vertexIndex;
+    float len;
+
+public:
+    Edge(){}
+        Edge(int v1, int v2, float l){
+            _vertexIndex.push_back(v1);
+            _vertexIndex.push_back(v2);
+            len = l;
+        }
+        int v1()
+        {
+            return _vertexIndex[0];
+        }
+
+        int v2()
+        {
+            return _vertexIndex[1];
+        }
+        float length()
+        {
+            return len;
+        }
+};
 
 
 //** TO MODIFY
@@ -173,6 +199,7 @@ class Mesh
 
     QVector<PVertex> _vertexArray;
     QVector<PTriangle> _facesArray;
+    QVector<Edge> _edgeArray;
 public:
 
     Mesh();
@@ -189,6 +216,10 @@ public:
     void draw(); // Draw the mesh
     void drawWire(); // Draw the mesh in WireFrame
     void init();
+
+    void quickSort(QVector<Edge> & edge_array, int low, int high); // sort edge array
+    int partition(QVector<Edge> & edge_array, int low, int high);
+    float length(int v1, int v2);
 
     void test_face()
     {
